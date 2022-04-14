@@ -362,6 +362,15 @@ TABLE_MAP = {
 }
 
 
+def clean_null_values(row: dict) -> dict:
+    """Clean NULL values from the dictionary.
+
+    NULL cells in the CSV files are filled with "\\N". This function removes
+    them from the dictionary.
+    """
+    return {k: v if v != "\\N" else None for k, v in row.items()}
+
+
 def import_table(con: Connection, name: str, content: csv.DictReader) -> None:
     """Create the schema based on the name."""
     if name not in TABLE_MAP:
@@ -374,9 +383,8 @@ def import_table(con: Connection, name: str, content: csv.DictReader) -> None:
     cur.execute(f"DROP TABLE IF EXISTS {name}")
     cur.execute(create_sql)
     for row in content:
-        # TODO: Null values are coming as "\\N"
         try:
-            cur.execute(insert_sql, row)
+            cur.execute(insert_sql, clean_null_values(row))
         except ProgrammingError as exc:
             click.secho(f"{exc}:\nRow Content: {row}", fg="bright_red")
             return
