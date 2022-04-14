@@ -2,11 +2,12 @@
 import csv
 import sqlite3
 from io import TextIOWrapper
+from pathlib import Path
 from zipfile import ZipFile
 
 import click
 
-from importer.tables import create_table
+from importer.schema import import_table
 
 
 @click.command()
@@ -28,7 +29,8 @@ def run(input_file: str, output: str):
         for name in input_zip.namelist():
             with input_zip.open(name) as csv_fd:
                 reader = csv.DictReader(TextIOWrapper(csv_fd, "utf-8"))
-                create_table(con=con, name=name, content=reader)
+                path = Path(name)
+                import_table(con=con, name=path.stem, content=reader)
 
     con.close()
 
