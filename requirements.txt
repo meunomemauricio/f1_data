@@ -1,4 +1,7 @@
+black
 click==8.1.2
+isort
 jupyterlab
+jupyterlab_code_formatter
 matplotlib==3.5.1
 pandas==1.4.2
